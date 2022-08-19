@@ -3,10 +3,17 @@
 {-# LANGUAGE TypeFamilies              #-}
 module Main (main) where
 
-import Radix ( addWord, createTree, printTree )
+import Radix ( addWord, deleteWord, searchWord, createTree, printTree )
+
+benchmark = "not implemented"
 
 main :: IO ()
 main = do
-    let t = foldl addWord createTree ["romane", "romanus", "romulus", "rubens", "ruber", "rubicon", "rubicundus" ]
+    let t = foldl addWord createTree ["romane", "roman", "romanus", "romulus", "rubens", "ruber", "rubicon", "rubicundus" ]
 
-    printTree t
+    let deletedT = foldl deleteWord t ["rubicon"]
+
+    let searchResult = searchWord deletedT "rubicon"
+    print searchResult
+
+    printTree deletedT

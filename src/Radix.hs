@@ -3,7 +3,7 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Radix where
 
-import Data.List ( minimumBy, delete )
+import Data.List ( minimumBy, delete, elemIndex )
 import Diagrams.Prelude
     ( (&),
       white,
@@ -21,7 +21,7 @@ import qualified Data.Tree ( Tree(Node) )
 import Diagrams.TwoD.Layout.Tree
     ( renderTree, slHSep, slVSep, symmLayout' )
 import Diagrams.Backend.SVG.CmdLine ( B, mainWith )
-
+import Data.Maybe (fromJust, isJust)
 data Node = Node {
     label :: String,
     fullword :: String,
@@ -41,6 +41,12 @@ createTree = Node { wordNode = False, label = "", fullword = "", children = [] }
 
 addWord :: Tree -> String -> Tree
 addWord t w = add t Node { wordNode = True, label = w, fullword = w, children = [] }
+
+deleteWord :: Tree -> String -> Tree
+deleteWord t w = deleteNode w t
+
+searchWord :: Tree -> String -> String
+searchWord t w = if searchNode w t then "The tree contains the word " ++ w else "The tree does not contain the word " ++ w
 
 
 -- Internals
@@ -72,9 +78,21 @@ add t n
                                                             | otherwise = GT
             matches = zip [0..(length $ children t)] (map (getMatch n) (children t))
 
+deleteNode :: String -> Node -> Node
+deleteNode w n
+    | isJust dNI = n { children = dNC ++ delete dN (children n) }
+    | otherwise = n { children = map (deleteNode w) (children n) }
+    where   dNI = elemIndex True (map (\node -> fullword node == w) (children n)) -- The index of the deleted Node
+            dN = children n !! fromJust dNI -- The deletedNode
+            dNC = map (\node -> node { label = label dN ++ label node }) (children dN) -- Children of the deleted Node. Their label has been modified to be that of their parent and their own.
+
+searchNode :: String -> Node -> Bool
+searchNode w n
+    | fullword n == w = True
+    | null $ children n = False
+    | otherwise = any (searchNode w) (children n)
+
 -- Printing Tree
-
-
 
 traverseTree :: Node -> Data.Tree.Tree String
 traverseTree n

@@ -1,0 +1,1 @@
+stack run -- -o out/out.svg -w 400

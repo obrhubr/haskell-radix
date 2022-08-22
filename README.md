@@ -51,7 +51,9 @@ let word = searchWord deletedT "rubicon"
 ## Examples
 
 The wikipedia example tree using my implementation:
+
 ![wikipedia example in haskell](.github/wikipedia_example.svg)
 
 A worst case example:
+
 ![worst case](.github/worst_case.svg)
